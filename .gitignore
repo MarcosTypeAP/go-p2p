@@ -1,0 +1,6 @@
+/.win
+/cmd/example/*
+
+!/cmd/example/chat/
+/cmd/example/chat/*
+!/cmd/example/chat/chat.go

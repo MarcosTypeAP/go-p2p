@@ -34,6 +34,8 @@ $ go get github.com/MarcosTypeAP/go-p2p
 $ go install github.com/MarcosTypeAP/go-p2p/cmd/genpackets@latest
 ```
 
+## Usage
+
 <details>
 <summary>API Example</summary>
 

@@ -15,7 +15,7 @@ import (
 	"github.com/MarcosTypeAP/go-p2p"
 )
 
-//go:generate go run github.com/MarcosTypeAP/go-p2p/cmd/genpackets -prefix=Payload
+//go:generate genpackets -prefix=Payload
 
 //p2p:packet -need-ack
 const (

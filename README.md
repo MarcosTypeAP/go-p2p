@@ -17,6 +17,23 @@ Some routers may have stricter rules that prevent you from establishing a connec
 - **Fully Asynchronous**: The API allows you to send packets without blocking and receive packets by registering handlers for specific packet types.
 - **Auto-generated Packets**: You can auto-generate utilities (at pre-compile time) for building and parsing packets by just declaring their payload with `struct`s.
 
+## Installation
+
+#### Import
+```go
+import "github.com/MarcosTypeAP/go-p2p"
+```
+
+#### Download
+```bash
+$ go mod tidy
+# Or
+$ go get github.com/MarcosTypeAP/go-p2p
+
+# Install the packet generator (optional)
+$ go install github.com/MarcosTypeAP/go-p2p/cmd/genpackets@latest
+```
+
 <details>
 <summary>API Example</summary>
 
@@ -34,7 +51,6 @@ import (
 )
 
 // Auto-generate utilities
-//go:generate -command genpackets go run github.com/MarcosTypeAP/go-p2p/cmd/genpackets
 //go:generate genpackets -prefix=Payload -payload-flags=-fields=all
 
 // Group level
@@ -217,7 +233,7 @@ func main() {
 
 ```bash
 // Generate utilities before compiling
-$ go generate <package> 
+$ go generate [<package>]
 ```
 
 </details>
@@ -225,7 +241,7 @@ $ go generate <package>
 <details>
 <summary>Genpackets Usage</summary>
 
-> :warning: This may be outdated, if you are using it, see it running `go run github.com/MarcosTypeAP/go-p2p/cmd/genpackets -help`.
+> :warning: This may be outdated, if you are using it, see it running `genpackets -help`.
 
 ```
 Genpackets generates builders and parsers for the specified packet kinds.
@@ -329,10 +345,11 @@ $ mkdir chatapp && cd chatapp
 $ go mod init chatapp
 
 // Download the chat code example
-$ wget https://github.com/MarcosTypeAP/go-p2p/blob/main/cmd/example/chat/chat.go
+$ wget https://raw.githubusercontent.com/MarcosTypeAP/go-p2p/refs/heads/main/cmd/example/chat/chat.go
 
-// Download `go-p2p`
+// Download `go-p2p` and `genpackets`
 $ go mod tidy
+$ go install github.com/MarcosTypeAP/go-p2p/cmd/genpackets@latest
 
 // Generate packet utilities
 $ go generate

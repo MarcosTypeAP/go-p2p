@@ -1,5 +1,9 @@
 # go-p2p
 
+<p align="left">
+  <a href="https://pkg.go.dev/github.com/MarcosTypeAP/go-p2p"><img src="https://pkg.go.dev/badge/github.com/MarcosTypeAP/go-p2p.svg" alt="Go Reference"></a>
+</p>
+
 **go-p2p** is an easy-to-use game-dev datagram-based P2P networking library focused on reducing boilerplate while remaining robust and flexible
 which allows you to communicate without external servers, and without worrying about NAT and port forwarding on routers.
 It was primarily designed as a game development library, implementing a lightweight version of TCP over UDP,
@@ -33,6 +37,8 @@ $ go get github.com/MarcosTypeAP/go-p2p
 # Install the packet generator (optional)
 $ go install github.com/MarcosTypeAP/go-p2p/cmd/genpackets@latest
 ```
+
+## Usage
 
 <details>
 <summary>API Example</summary>

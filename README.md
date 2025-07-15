@@ -49,11 +49,11 @@ $ go install github.com/MarcosTypeAP/go-p2p/cmd/genpackets@latest
 package main
 
 import (
-	"context"
-	"fmt"
-	"log"
+    "context"
+    "fmt"
+    "log"
 
-	"github.com/MarcosTypeAP/go-p2p"
+    "github.com/MarcosTypeAP/go-p2p"
 )
 
 // Auto-generate utilities
@@ -63,171 +63,171 @@ import (
 //
 //p2p:packet -need-ack
 const (
-	PacketMessage = p2p.PacketCustom + iota
+    PacketMessage = p2p.PacketCustom + iota
 
-	// Packet level
-	PacketPing //p2p:packet -need-ack -exclude=parser
-	PacketPong //p2p:packet -need-ack -exclude=parser
+    // Packet level
+    PacketPing //p2p:packet -need-ack -exclude=parser
+    PacketPong //p2p:packet -need-ack -exclude=parser
 
-	PacketSomething //p2p:packet
-	// ...
+    PacketSomething //p2p:packet
+    // ...
 )
 
 type PayloadPacketMessage struct {
-	msg string
+    msg string
 }
 
 type Thing struct {
-	nested string
+    nested string
 }
 
 //p2p:payload PacketSomething -fields=unexported -ref=parser
 type PayloadPacketSomething struct {
-	ptr    *float32
-	random struct {
-		a       int
-		b       Thing
-		mapList []map[int]string
-	}
-	Exported int
+    ptr    *float32
+    random struct {
+        a       int
+        b       Thing
+        mapList []map[int]string
+    }
+    Exported int
 }
 
 func client() {
     // Imagine this is useful
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
 
-	// Connect to 100.100.100.100 (both peers are using the default port)
-	conn, err := p2p.Dial(ctx, "100.100.100.100")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
+    // Connect to 100.100.100.100 (both peers are using the default port)
+    conn, err := p2p.Dial(ctx, "100.100.100.100")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer conn.Close()
 
-	// Listen for PacketPing and reply with PacketPong
-	conn.OnReceive(PacketPing, func(packet p2p.Packet) {
-		buf := make([]byte, p2p.HeaderSize)
-		conn.Send(BuildPacketPong(buf))
-	})
+    // Listen for PacketPing and reply with PacketPong
+    conn.OnReceive(PacketPing, func(packet p2p.Packet) {
+        buf := make([]byte, p2p.HeaderSize)
+        conn.Send(BuildPacketPong(buf))
+    })
 
-	thing := PayloadPacketSomething{}
-	thing.random.mapList = make([]map[int]string, 2)
-	for i := range len(thing.random.mapList) {
-		thing.random.mapList[i] = make(map[int]string, 4)
-	}
+    thing := PayloadPacketSomething{}
+    thing.random.mapList = make([]map[int]string, 2)
+    for i := range len(thing.random.mapList) {
+        thing.random.mapList[i] = make(map[int]string, 4)
+    }
 
-	// Listen for PacketSomething and parse it without allocating new memory
-	conn.OnReceive(PacketSomething, func(packet p2p.Packet) {
-		err = ParsePacketSomething(packet, &thing)
-		if err != nil {
-			log.Fatal(err)
-		}
-		for _, m := range thing.random.mapList {
-			for k, v := range m {
-				log.Println("Some random thing:", k, v)
-			}
-		}
-	})
+    // Listen for PacketSomething and parse it without allocating new memory
+    conn.OnReceive(PacketSomething, func(packet p2p.Packet) {
+        err = ParsePacketSomething(packet, &thing)
+        if err != nil {
+            log.Fatal(err)
+        }
+        for _, m := range thing.random.mapList {
+            for k, v := range m {
+                log.Println("Some random thing:", k, v)
+            }
+        }
+    })
 
-	msg := PayloadPacketMessage{"some message"}
-	buf := make([]byte, 32)
+    msg := PayloadPacketMessage{"some message"}
+    buf := make([]byte, 32)
 
-	// Send a PacketMessage and wait for it to arrive
-	err = <-conn.Send(BuildPacketMessage(buf, msg))
-	if err != nil {
-		log.Fatal(err)
-	}
+    // Send a PacketMessage and wait for it to arrive
+    err = <-conn.Send(BuildPacketMessage(buf, msg))
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	// Wait to receive a PacketMessage
-	res := <-conn.Receive(PacketMessage, buf)
-	if res.Err != nil {
-		log.Fatal(res.Err)
-	}
-	// And then parse it
-	msg, err = ParsePacketMessage(res.Packet)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Received message:", msg.msg)
+    // Wait to receive a PacketMessage
+    res := <-conn.Receive(PacketMessage, buf)
+    if res.Err != nil {
+        log.Fatal(res.Err)
+    }
+    // And then parse it
+    msg, err = ParsePacketMessage(res.Packet)
+    if err != nil {
+        log.Fatal(err)
+    }
+    log.Println("Received message:", msg.msg)
 
-	// Wait for the connection to end
-	<-conn.Done()
+    // Wait for the connection to end
+    <-conn.Done()
 
-	// Check the cause why it ended
-	err = conn.Err()
-	if err != nil {
-		if errors.Is(err, p2p.ErrPeerClosed) {
-			log.Println("Peer disconnected")
-			return
-		}
-		log.Fatal(err)
-	}
+    // Check the cause why it ended
+    err = conn.Err()
+    if err != nil {
+        if errors.Is(err, p2p.ErrPeerClosed) {
+            log.Println("Peer disconnected")
+            return
+        }
+        log.Fatal(err)
+    }
 }
 
 func server() {
     // Imagine this is useful
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+    ctx, cancel := context.WithCancel(context.Background())
+    defer cancel()
 
-	// Wait for 200.200.200.200 to connect (both peers are using the default port)
-	conn, err := p2p.Listen(ctx, "200.200.200.200", p2p.WithReceiveBufferSize(8), p2p.WithReuseAddress()) // Some random options
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer conn.Close()
+    // Wait for 200.200.200.200 to connect (both peers are using the default port)
+    conn, err := p2p.Listen(ctx, "200.200.200.200", p2p.WithReceiveBufferSize(8), p2p.WithReuseAddress()) // Some random options
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer conn.Close()
 
-	// Listen to unexpected packets and exit
-	conn.OnReceiveUnexpected(func(packet p2p.Packet) {
-		log.Fatalf("Received unexpected packet: kind=%v, payload=%d", packet.Kind(), packet.Payload())
-	})
+    // Listen to unexpected packets and exit
+    conn.OnReceiveUnexpected(func(packet p2p.Packet) {
+        log.Fatalf("Received unexpected packet: kind=%v, payload=%d", packet.Kind(), packet.Payload())
+    })
 
-	thing := PayloadPacketSomething{
-		random: struct {
-			a       int
-			b       Thing
-			mapList []map[int]string
-		}{
-			mapList: []map[int]string{
-				{},
-				{
-					69:   "420",
-					1337: "leet",
-				},
-			},
-		},
-	}
-	buf := make([]byte, 128)
+    thing := PayloadPacketSomething{
+        random: struct {
+            a       int
+            b       Thing
+            mapList []map[int]string
+        }{
+            mapList: []map[int]string{
+                {},
+                {
+                    69:   "420",
+                    1337: "leet",
+                },
+            },
+        },
+    }
+    buf := make([]byte, 128)
 
-	// Send a PacketSomething 3 times because it doesn't have the -need-ack flag (hope at least one arrives)
-	thingPacket := BuildPacketSomething(buf, thing)
-	for range 3 {
-		conn.Send(thingPacket)
-	}
+    // Send a PacketSomething 3 times because it doesn't have the -need-ack flag (hope at least one arrives)
+    thingPacket := BuildPacketSomething(buf, thing)
+    for range 3 {
+        conn.Send(thingPacket)
+    }
 
-	// Wait to receive a PacketMessage
-	res := <-conn.Receive(PacketMessage, buf)
-	if res.Err != nil {
-		log.Fatal(res.Err)
-	}
-	// And then parse it
-	msg, err := ParsePacketMessage(res.Packet)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Println("Received message:", msg.msg)
+    // Wait to receive a PacketMessage
+    res := <-conn.Receive(PacketMessage, buf)
+    if res.Err != nil {
+        log.Fatal(res.Err)
+    }
+    // And then parse it
+    msg, err := ParsePacketMessage(res.Packet)
+    if err != nil {
+        log.Fatal(err)
+    }
+    log.Println("Received message:", msg.msg)
 
-	// Wait for the connection to end
-	<-conn.Done()
+    // Wait for the connection to end
+    <-conn.Done()
 
-	// Check the cause why it ended
-	err = conn.Err()
-	if err != nil {
-		if errors.Is(err, p2p.ErrPeerClosed) {
-			log.Println("Peer disconnected")
-			return
-		}
-		log.Fatal(err)
-	}
+    // Check the cause why it ended
+    err = conn.Err()
+    if err != nil {
+        if errors.Is(err, p2p.ErrPeerClosed) {
+            log.Println("Peer disconnected")
+            return
+        }
+        log.Fatal(err)
+    }
 }
 
 func main() {
